@@ -1,0 +1,44 @@
+import tkinter as tk
+import requests
+from PIL import Image, ImageTk
+
+# Função para buscar a imagem astronômica do dia da NASA
+def buscar_apod():
+    api_key = "DJk6cjmZkuWDBteiWrwPOFNQ0LutFidMF7aXw4Ko"  # Substitua pelo sua própria API key da NASA
+    url = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
+    resposta = requests.get(url)
+    dados = resposta.json()
+
+    titulo = dados["title"]
+    explicacao = dados["explanation"]
+    imagem_url = dados["url"]
+
+    # Exibir título e explicação
+    titulo_label.config(text=titulo)
+    explicacao_label.config(text=explicacao)
+
+    # Exibir a imagem astronômica
+    imagem = Image.open(requests.get(imagem_url, stream=True).raw)
+    imagem = imagem.resize((400, 400), Image.ANTIALIAS)
+    imagem = ImageTk.PhotoImage(imagem)
+    imagem_label.config(image=imagem)
+    imagem_label.image = imagem
+
+# Configuração da janela principal
+janela = tk.Tk()
+janela.title("NASA Astronomy Picture of the Day")
+
+# Criação de elementos da interface
+botao_buscar = tk.Button(janela, text="Buscar APOD", command=buscar_apod)
+titulo_label = tk.Label(janela, text="", font=("Helvetica", 16))
+explicacao_label = tk.Label(janela, text="", wraplength=400)
+imagem_label = tk.Label(janela)
+
+# Layout dos elementos
+botao_buscar.pack()
+titulo_label.pack()
+explicacao_label.pack()
+imagem_label.pack()
+
+# Inicialização da janela
+janela.mainloop()
